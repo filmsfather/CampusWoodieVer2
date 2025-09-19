@@ -1,10 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Vercel 배포 최적화 설정
+  // Vercel 배포 최적화 설정  
   experimental: {
     // 성능 향상을 위한 실험적 기능들
     optimizePackageImports: ['lucide-react', '@supabase/supabase-js']
+  },
+  
+  // SSG 관련 설정 - 인증 페이지는 클라이언트 사이드 렌더링
+  generateBuildId: async () => {
+    return 'campus-woodie-' + Date.now()
   },
   
   // 이미지 최적화 설정

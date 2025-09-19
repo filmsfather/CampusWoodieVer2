@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   description: "영화 교육을 위한 학습 관리 시스템",
 };
 
+// 모든 페이지를 동적 렌더링으로 설정 (SSG 방지)
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: Readonly<{

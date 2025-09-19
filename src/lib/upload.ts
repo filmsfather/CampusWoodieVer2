@@ -59,7 +59,7 @@ export const uploadApi = {
       const filePath = `${workbookItemId}/${fileName}`
 
       // Supabase Storage에 업로드
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('item-images')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -121,7 +121,7 @@ export const uploadApi = {
       const filePath = `${studentTaskId}/${fileName}`
 
       // Supabase Storage에 업로드
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('task-images')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -238,7 +238,7 @@ export const uploadApi = {
       const filePath = `${studentTaskId}/${sanitizedFileName}`
 
       // Supabase Storage에 업로드
-      const { data, error } = await supabase.storage
+      const { error } = await supabase.storage
         .from('pdf-submissions')
         .upload(filePath, file, {
           cacheControl: '3600',
