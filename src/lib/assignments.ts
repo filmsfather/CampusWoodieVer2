@@ -129,7 +129,7 @@ export const assignmentApi = {
     // 각 과제의 완료율 계산
     const assignmentsWithStats = await Promise.all(
       (data || []).map(async (assignment: Record<string, unknown>) => {
-        const stats = await this.getAssignmentCompletionStats(assignment.id)
+        const stats = await this.getAssignmentCompletionStats(assignment.id as number)
         
         // 반 이름 조회 (target_type이 'class'인 경우)
         let className = ''

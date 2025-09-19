@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   // Vercel 배포 최적화 설정
   experimental: {
     // 성능 향상을 위한 실험적 기능들
-    optimizeCss: true,
     optimizePackageImports: ['lucide-react', '@supabase/supabase-js']
   },
   
@@ -25,8 +24,7 @@ const nextConfig: NextConfig = {
     formats: ['image/webp', 'image/avif']
   },
 
-  // 출력 설정 (Vercel에서는 기본값 사용)
-  output: 'standalone',
+  // Vercel에서는 기본 출력 설정 사용
 
   // TypeScript 설정
   typescript: {

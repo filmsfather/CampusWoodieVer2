@@ -63,9 +63,9 @@ export const classApi = {
       const members = cls.class_members?.map((cm: Record<string, unknown>) => ({
         user_id: cm.user_id as string,
         user: cm.profiles ? {
-          id: cm.profiles.id as string,
-          name: cm.profiles.name as string,
-          role: Array.isArray(cm.profiles.role) ? cm.profiles.role : [cm.profiles.role]
+          id: (cm.profiles as Record<string, unknown>).id as string,
+          name: (cm.profiles as Record<string, unknown>).name as string,
+          role: Array.isArray((cm.profiles as Record<string, unknown>).role) ? (cm.profiles as Record<string, unknown>).role : [(cm.profiles as Record<string, unknown>).role]
         } : null
       })).filter((member): member is {user_id: string, user: {id: string, name: string, role: string[]}} => member.user !== null) || []
 
@@ -120,9 +120,9 @@ export const classApi = {
     const members = data.class_members?.map((cm: Record<string, unknown>) => ({
       user_id: cm.user_id as string,
       user: cm.profiles ? {
-        id: cm.profiles.id as string,
-        name: cm.profiles.name as string,
-        role: Array.isArray(cm.profiles.role) ? cm.profiles.role : [cm.profiles.role]
+        id: (cm.profiles as Record<string, unknown>).id as string,
+        name: (cm.profiles as Record<string, unknown>).name as string,
+        role: Array.isArray((cm.profiles as Record<string, unknown>).role) ? (cm.profiles as Record<string, unknown>).role : [(cm.profiles as Record<string, unknown>).role]
       } : null
     })).filter((member): member is {user_id: string, user: {id: string, name: string, role: string[]}} => member.user !== null) || []
 
