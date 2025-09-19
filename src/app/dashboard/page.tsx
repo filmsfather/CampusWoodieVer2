@@ -1,5 +1,8 @@
 'use client'
 
+// 정적 생성 방지
+export const dynamic = 'force-dynamic'
+
 import { useAuth } from '@/contexts/AuthContext'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import AppLayout from '@/components/layout/AppLayout'

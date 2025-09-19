@@ -1,5 +1,8 @@
 'use client'
 
+// 정적 생성 방지
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
