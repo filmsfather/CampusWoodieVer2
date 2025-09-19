@@ -1,0 +1,712 @@
+WoodieFilm Academy — MVP PRD (Supabase + Vercel)
+문서버전: v1.1 (Minimal)
+ 작성일: 2025-09-16
+ 작성자: ChatGPT (with 우디쌤)
+ 대상: 기획/디자인/프론트/백엔드/운영
+
+0) 원칙
+**최소기능(MVP)**만 구현. 추가 기능/자동화/알림/통계는 전부 비범위.
+
+
+Supabase: Auth, Postgres, Storage, RLS만 사용. (Edge Functions 불필요)
+
+
+Vercel: 정적 UI + 클라이언트에서 Supabase SDK로 직접 호출. (서버 API 생략)
+
+
+역할/권한은 단순 Bool/Enum로 처리. (학생/선생님/Admin)
+
+
+파일업로드 정책(MVP): PDF 제출형은 학생 과제당 PDF 1개(필수). 이미지 업로드는 모든 유형에서 허용하며 다중 이미지 지원. 단, 최소 설계로 문항 이미지(여러 장) 과 과제별 학생 첨부 이미지(여러 장) 두 레벨만 지원.
+
+
+
+1) 범위(Scope)
+1.1 기능 개요
+문제집(Workbook) 생성 (권한: 선생님)
+
+
+텍스트 기반 문제 + 선택적 문항 이미지 다중 업로드(문항당 여러 장)
+
+
+태그(문자 배열), 과목(연출/작법/연구/통합), 주차 or 공통, 제목
+
+
+유형(아래 5종)
+
+
+문제집 유형
+
+
+SRS형: 단답/다지선다. 간격반복 로직(오답→1분 / 1정답→10분 / 2정답→1일 / 3정답→완료)
+
+
+PDF 제출형: PDF 1개 업로드 시 완료
+
+
+서술형: 텍스트 제출 시 완료 → 교사대시보드에서 리스트업/평가/피드백
+
+
+영화감상형: 감상노트 N개(교사 지정) 작성 시 완료. 필터(국가/감독/장르/하위장르)
+
+
+인터넷강의시청형: 유튜브 링크 연결, 내용 요약 제출 시 완료
+
+
+문제집 출제(Assign) (권한: 선생님)
+
+
+반 리스트 확인 → 대상 선택(반/개인) → 문제집 선택(필터: 과목/차시/제목)
+
+
+마감일 설정 → 출제
+
+
+문제집 풀기(학생)
+
+
+이번주 과제 확인(마감일 필터) → 과제 선택 → 수행 → 완료처리
+
+
+문제집 완수 점검(교사)
+
+
+반별 현황, 개인별 완수율(마감 지난 과제 기준 = 완료 수/총 수×100)
+
+
+유형별 점검 UI
+
+
+SRS: 완료/미완료
+
+
+PDF: 업로드 확인 + 인쇄요청(희망일/교시/부수/흑백·컬러) + 상태(미완/완료/취소)
+
+
+서술형: 제출 답안 확인 + 평가(상/중상/중/중하/하) + 텍스트 피드백
+
+
+영화감상: 완료/미완료 + 학생별 감상노트 링크
+
+
+인터넷강의: 완료/미완료 + 요약 내용 확인
+
+
+Admin
+
+
+가입 권한 관리(Supabase Auth 연동) → 역할 부여/해제(학생/선생님/Admin)
+
+
+반 생성/배정/배정취소/삭제
+
+
+인쇄 큐(반/교시/선생별) 리스트업 + 완료체크
+
+
+
+2) 비범위(Non‑Goals)
+알림(푸시/이메일/카톡), 캘린더 연동, 통계 대시보드, 고급 권한체계, 멀티 파일 업로드 전반(이미지 제외), 파일 미리보기, 실시간/소켓, Edge Functions, 복잡한 태그 검색, 임포트/엑스포트, 버전관리, 출석/근태/결제 등 모두 제외.
+
+
+예외: 이미지에 한해서만 문항/과제 단위의 다중 업로드 허용(본 문서에 포함).
+
+
+알림(푸시/이메일/카톡), 캘린더 연동, 통계 대시보드, 고급 권한체계, 다중 파일 업로드, 파일 미리보기, 멀티 이미지, 실시간/소켓, Edge Functions, 복잡한 태그 검색, 임포트/엑스포트, 버전관리, 출석/근태/결제 등 모두 제외.
+
+
+
+3) IA & 화면(최소 경로)
+/login 로그인 (Supabase Auth)
+
+
+/student/tasks 내 과제(기본: 마감 임박순)
+
+
+/student/task/:taskId 과제 수행
+
+
+/teacher/workbooks 문제집 목록/신규
+
+
+/teacher/workbook/new 문제집 생성
+
+
+/teacher/assign 출제 화면
+
+
+/teacher/classes/:classId 반별 과제 현황
+
+
+/teacher/reviews 서술형 평가 리스트
+
+
+/admin/classes 반 관리
+
+
+/admin/print-queue 인쇄 큐
+
+
+모바일 1단, 데스크탑 2단. 테이블+폼만. 검색은 텍스트 입력 1개 + 과목 드롭다운만 제공.
+
+4) 데이터 모델 (Supabase Postgres)
+최소 컬럼만. Audit 컬럼은 id, created_at, updated_at 공통.
+4.1 사용자 & 반
+profiles: id(uuid, PK = auth.uid), name text, role enum('student','teacher','admin')[]
+
+
+classes: id, name text
+
+
+class_members: class_id FK, user_id FK
+
+
+4.2 문제집
+workbooks: id, title, subject enum('연출','작법','연구','통합'), type enum('SRS','PDF','ESSAY','VIEWING','LECTURE'), tags text[], week int null, is_common bool, required_count int null (VIEWING), youtube_url text null (LECTURE), created_by FK(profiles)
+
+
+workbook_items (SRS/ESSAY 전용): id, workbook_id, prompt text, item_type enum('short','mcq','essay'), options jsonb null, answer_key text null
+
+
+4.3 출제/과제/진행
+assignments: id, workbook_id FK, target_type enum('class','user'), target_id (class_id or user_id), session_no int null, due_at timestamptz, created_by
+
+
+student_tasks: id, assignment_id FK, user_id FK, status enum('pending','in_progress','completed'), progress_pct int
+
+
+4.4 제출물
+answers (SRS/ESSAY 공용): id, student_task_id, workbook_item_id, response_text text null, selected_option int null, correctness enum('wrong','once','twice','thrice') null
+
+
+srs_state: id, answer_id FK, streak int default 0, next_due_at timestamptz
+
+
+essay_reviews: id, student_task_id, grade enum('상','중상','중','중하','하') null, feedback text null
+
+
+viewing_notes: id, student_task_id, title text, country text, director text, genre text, subgenre text, notes text
+
+
+lecture_summaries: id, student_task_id, summary text
+
+
+pdf_uploads: id, student_task_id, file_path text
+
+
+print_requests: id, pdf_upload_id FK, preferred_date date, period text, copies int, color enum('bw','color'), status enum('requested','done','canceled')
+
+
+workbook_item_images: id, workbook_item_id FK, file_path text (문항 이미지, 여러 장)
+
+
+task_images: id, student_task_id FK, file_path text (학생 과제 첨부 이미지, 여러 장)
+
+
+4.5 Storage (Supabase)
+버킷:
+
+
+pdf-submissions : 경로 student_task_id/filename.pdf (과제당 1개)
+
+
+item-images : 경로 workbook_item_id/uuid.jpg (문항당 여러 장)
+
+
+task-images : 경로 student_task_id/uuid.jpg (과제당 여러 장, 학생 첨부)
+ (Supabase)
+
+
+버킷:
+
+
+pdf-submissions : 경로 student_task_id/filename.pdf (과제당 1개)
+
+
+item-images : 경로 workbook_item_id/uuid.jpg (문항당 여러 장)
+
+
+task-images : 경로 student_task_id/uuid.jpg (과제당 여러 장, 학생 첨부)
+
+
+
+5) 문제집 완수 점검(교사)
+5.1 반별 현황 (All Classes)
+목적: 모든 교사가 모든 반의 진행 상황을 한 화면에서 비교/점검.
+
+
+필터: 반, 과목, 유형, 마감기간(지난주/이번주/사용자 지정).
+
+
+표시: 선택한 반의 학생 리스트와 각 학생의 개별 완료율(마감 지난 과제 기준) 및 미완료 과제 수.
+
+
+지표 정의: 학생별 완료율(%) = (학생이 완료한 student_tasks ÷ 학생에게 부여된 전체 student_tasks) × 100 (전체 범위)
+
+
+액션: 학생 클릭 → 해당 학생의 과제 상세(유형별 제출물/상태)로 이동.
+
+
+5.2 개별 과제 현황 (My Assignments)
+목적: 해당 주 수업 준비를 위해 로그인 교사가 본인이 출제한 과제만 점검.
+
+
+노출 범위: 본인 출제 assignments만. 다른 교사가 출제한 과제는 표시하지 않음.
+
+
+표시(반별 그룹):
+
+
+좌측 패널: 내가 과제를 출제한 반 목록(최근 출제순). 반을 선택하면 우측에 해당 반의 내 과제만 표시.
+
+
+우측 콘텐츠: 선택한 반의 과제 카드 리스트(내가 출제한 것만)
+
+
+카드 정보: 과제 제목 / 유형 / 마감일 / 완료율(전체 범위) / 미완료 n명
+
+
+드릴다운: "미완료 n명" 클릭 시 미완료 학생 테이블(학생명, 상태, 제출물 바로가기: 서술형/감상노트/요약/파일)
+
+
+필터/정렬: 주(이번주/지난주/전체), 과목, 유형, 마감상태(지난/다가오는) / 기본 정렬=마감 임박순, 검색=과제 제목·학생명.
+
+
+액션: 학생별 상태 확인, 피드백 작성(서술형), 반별 일괄 인쇄요청 생성(PDF; 선택 과제의 제출물 전체/선택 항목 대상), 인쇄요청 확인/링크 이동(PDF), 감상노트/요약 바로가기.
+
+
+5.3 유형별 점검 UI 유형별 점검 UI
+SRS형: 완료/미완료 (완료 기준 = 해당 과제의 모든 문항 streak=3).
+
+
+PDF 제출형: 업로드 여부 표시 + 인쇄요청(희망일/교시/부수/흑백·컬러) + 상태(requested/done/canceled).
+
+
+서술형: 제출 답안 확인 → 평가(상/중상/중/중하/하) + 텍스트 피드백.
+
+
+영화감상형: 완료/미완료 + 학생별 감상노트 링크(필터: 국가/감독/장르/하위장르).
+
+
+인터넷강의시청형: 완료/미완료 + 요약 내용 확인.
+
+
+5.4 완료율 계산식(명시)
+대상: 마감일이 지난 과제만 포함.
+
+
+적용 위치:
+
+
+**개별 과제 현황(My Assignments)**의 과제별 완료율
+
+
+**반별 현황(All Classes)**의 학생별 완료율
+
+
+식: 완료율(%) = (완료한 student_tasks 수 ÷ 전체 student_tasks 수) × 100 (전체 범위)
+
+
+6) Admin 핵심 로직 (최소) Admin 핵심 로직 (최소)
+6.1 SRS 진행 규칙
+answers.correctness와 srs_state.streak/next_due_at을 사용.
+
+
+규칙:
+
+
+오답 → streak=0, next_due_at=now()+1min
+
+
+1회 정답 → streak=1, next_due_at=now()+10min
+
+
+2회 정답 → streak=2, next_due_at=now()+1day
+
+
+3회 정답 → streak=3, 완료로 간주(해당 문항 더 안보여줌)
+
+
+완료 기준: 해당 student_task의 모든 SRS 문항 streak=3이면 status='completed'.
+
+
+6.2 PDF 제출형
+PDF 1개 업로드 시 student_task.status='completed'.
+
+
+6.3 서술형
+텍스트 제출 시 status='completed'.
+
+
+교사 화면에서 리스트업 후 grade,feedback 입력(선택).
+
+
+6.4 영화감상형
+assignment에 연결된 required_count(workbooks.required_count 사용). 학생이 viewing_notes 개수를 채우면 status='completed'.
+
+
+6.5 인터넷강의시청형
+youtube_url 노출. 요약 summary 제출 시 status='completed'.
+
+
+6.6 완수율(교사 대시보드)
+기준: 마감일 지난 과제만
+
+
+계산: 완료 student_tasks / 전체 student_tasks × 100 (assignment별 집계)
+
+
+6.7 인쇄 큐
+교사가 PDF 과제 제출물에서 인쇄 요청 생성 → print_requests.status='requested' 기본값
+
+
+반별 일괄 인쇄요청: My Assignments에서 반 선택 후 PDF 제출물 멀티 선택 → 다중 요청 생성(여러 print_requests insert). 실패 항목은 개별 재시도 버튼 제공.
+
+
+Admin/교사 화면에서 반/교시/선생 필터로 목록 → 처리 후 done 체크
+
+
+
+7) UX 플로우 (요약)
+7.1 선생님
+문제집 생성 → 출제(반/개인, 마감일) → 반 현황 확인
+
+
+(서술형) 리뷰 페이지에서 등급/피드백 입력
+
+
+(PDF) 제출물에서 인쇄요청 생성 → 인쇄 큐에서 처리
+
+
+7.2 학생
+내 과제 페이지 → 마감일순 확인
+
+
+유형별 과제 수행 → 제출/완료
+
+
+7.3 Admin
+반 생성/배정 관리
+
+
+권한(Role) 부여/해제
+
+
+인쇄 큐 관리
+
+
+
+8) 최소 UI 컴포넌트
+리스트 테이블(정렬/간단 검색, 행 멀티 선택 + 일괄 액션)
+
+
+폼(입력/저장/취소)
+
+
+상태 배지(pending/in_progress/completed, requested/done/canceled)
+
+
+필터 드롭다운(과목/반/교시)
+
+
+일괄 작업 바: 선택 항목에 대해 일괄 인쇄요청 생성
+
+
+
+9) 작업 우선순위 (의존도 기준)
+Auth & 기본 데이터 토대
+
+
+Supabase Auth + profiles(role 배열) upsert 트리거
+
+
+classes/class_members 생성(반/권한 관리)
+
+
+핵심 테이블 RLS 최소 정책 적용
+
+
+문제집 생성 베이스
+
+
+workbooks / workbook_items CRUD(문항 이미지 다중 업로드 포함)
+
+
+출제(Assignments) → 학생 과제 생성
+
+
+반/개인 대상 출제, student_tasks 생성(마감일 포함)
+
+
+Storage 버킷 준비: pdf-submissions, item-images, task-images
+
+
+학생 플로우(내 과제)
+
+
+/student/tasks 목록 → 과제 수행(유형별 제출: SRS/PDF/서술형/감상노트/요약/이미지) → 완료 처리
+
+
+교사 플로우: My Assignments(반별 표시)
+
+
+내가 출제한 과제만 반별 카드로 표시
+
+
+미완료 학생 드릴다운, 서술형 피드백 입력, 반별 일괄 인쇄요청 생성(PDF)
+
+
+교사 플로우: All Classes(반별 현황)
+
+
+모든 반에서 학생별 완료율(전체 범위) 및 미완료 수 확인
+
+
+Admin 플로우(최소)
+
+
+반/권한 관리 마감
+
+
+인쇄 큐 리스트업/처리(완료/취소)
+
+
+품질 마무리
+
+
+에러 상태/로딩/빈 상태 UX, 페이지네이션, 기본 인덱스, 간단 계측(로그)
+
+
+10) 간단 테스트 시나리오) 간단 테스트 시나리오
+학생 A: 반 X 소속. SRS형 3문항 과제 수행 → 3회 정답 시 완료 확인.
+
+
+학생 B: PDF 업로드 후 완료 처리 및 인쇄요청 생성 → 인쇄 큐에서 done 처리.
+
+
+학생 C: 영화감상형 required_count=3 → 노트 3개 작성 시 완료.
+
+
+선생님 T: 반별 현황에서 학생별 완료율 확인.
+
+
+Admin: 반 생성/배정, 역할 변경 반영 확인.
+
+
+
+11) 마이그레이션(샘플 최소 DDL)
+실제 배포 전 콘솔에서 컬럼명/Enum은 한국어 대신 영문으로 생성 권장.
+-- enums
+create type subject as enum ('directing','writing','research','integrated');
+create type workbook_type as enum ('SRS','PDF','ESSAY','VIEWING','LECTURE');
+create type role as enum ('student','teacher','admin');
+create type task_status as enum ('pending','in_progress','completed');
+create type print_status as enum ('requested','done','canceled');
+create type color_opt as enum ('bw','color');
+
+-- profiles
+create table profiles (
+  id uuid primary key references auth.users(id),
+  name text not null,
+  role role[] not null default '{student}',
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- classes
+create table classes (
+  id bigserial primary key,
+  name text not null,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table class_members (
+  class_id bigint references classes(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
+  primary key (class_id, user_id)
+);
+
+-- workbooks & items
+create table workbooks (
+  id bigserial primary key,
+  title text not null,
+  subject subject not null,
+  type workbook_type not null,
+  tags text[] default '{}',
+  week int,
+  is_common boolean default false,
+  required_count int,
+  youtube_url text,
+  created_by uuid references profiles(id),
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table workbook_items (
+  id bigserial primary key,
+  workbook_id bigint references workbooks(id) on delete cascade,
+  prompt text not null,
+  item_type text not null,
+  options jsonb,
+  answer_key text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- assignments & tasks
+create table assignments (
+  id bigserial primary key,
+  workbook_id bigint references workbooks(id) on delete cascade,
+  target_type text not null,
+  target_id text not null,
+  session_no int,
+  due_at timestamptz not null,
+  created_by uuid references profiles(id),
+  created_at timestamptz default now()
+);
+
+create table student_tasks (
+  id bigserial primary key,
+  assignment_id bigint references assignments(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
+  status task_status default 'pending',
+  progress_pct int default 0,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- submissions
+create table answers (
+  id bigserial primary key,
+  student_task_id bigint references student_tasks(id) on delete cascade,
+  workbook_item_id bigint references workbook_items(id) on delete cascade,
+  response_text text,
+  selected_option int,
+  correctness text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create table srs_state (
+  id bigserial primary key,
+  answer_id bigint references answers(id) on delete cascade,
+  streak int default 0,
+  next_due_at timestamptz
+);
+
+create table essay_reviews (
+  id bigserial primary key,
+  student_task_id bigint references student_tasks(id) on delete cascade,
+  grade text,
+  feedback text,
+  created_at timestamptz default now()
+);
+
+create table viewing_notes (
+  id bigserial primary key,
+  student_task_id bigint references student_tasks(id) on delete cascade,
+  title text,
+  country text,
+  director text,
+  genre text,
+  subgenre text,
+  notes text,
+  created_at timestamptz default now()
+);
+
+create table lecture_summaries (
+  id bigserial primary key,
+  student_task_id bigint references student_tasks(id) on delete cascade,
+  summary text,
+  created_at timestamptz default now()
+);
+
+create table pdf_uploads (
+  id bigserial primary key,
+  student_task_id bigint references student_tasks(id) on delete cascade,
+  file_path text not null,
+  created_at timestamptz default now()
+);
+
+create table print_requests (
+  id bigserial primary key,
+  pdf_upload_id bigint references pdf_uploads(id) on delete cascade,
+  preferred_date date,
+  period text,
+  copies int default 1,
+  color color_opt default 'bw',
+  status print_status default 'requested',
+  created_at timestamptz default now()
+);
+
+11.1 추가 DDL (다중 이미지 테이블)
+create table workbook_item_images (
+  id bigserial primary key,
+  workbook_item_id bigint references workbook_items(id) on delete cascade,
+  file_path text not null,
+  created_at timestamptz default now()
+);
+
+create table task_images (
+  id bigserial primary key,
+  student_task_id bigint references student_tasks(id) on delete cascade,
+  file_path text not null,
+  created_at timestamptz default now()
+);
+
+
+12) 최소 RLS 샘플
+실 운영 전 실제 정책은 콘솔에서 사용자 테스트로 검증.
+-- 예시: student_tasks 본인 것만
+create policy "own tasks" on student_tasks for select
+  using (auth.uid() = user_id);
+create policy "own tasks write" on student_tasks for update
+  using (auth.uid() = user_id);
+
+
+13) 구현 순서 체크리스트
+Supabase: Auth 활성화(이메일+비번), 프로필 upsert 트리거
+
+
+스키마/버킷 생성
+
+
+RLS 최소 정책
+
+
+UI: 로그인/역할별 라우팅
+
+
+UI: 학생 플로우 전부 동작
+
+
+UI: 선생님 플로우 전부 동작(출제/현황/서술형/인쇄요청)
+
+
+UI: Admin(반/권한/인쇄 큐)
+
+
+스모크 테스트 & 더미 데이터
+
+
+
+14) 성공 기준 (MVP Done)
+선생님이 5유형 문제집을 만들고, 반에 출제하여, 학생이 제출/완료까지 전부 가능
+
+
+교사가 마감 지난 과제 기준으로 완수율을 확인 가능
+
+
+PDF 인쇄 요청을 생성하고 완료 체크 가능
+
+
+Admin이 반/권한을 UI에서 조작 가능
+
+
+
+15) 향후(Out of Scope → Next)
+알림/리마인드, 고급 권한(반별 교사 권한), 고급 통계, 멀티파일/미리보기, Edge Functions, 오프라인/모바일 앱, CSV 임포트/엑스포트
+
+
+

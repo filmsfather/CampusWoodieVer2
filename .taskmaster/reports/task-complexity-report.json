@@ -1,0 +1,93 @@
+{
+	"meta": {
+		"generatedAt": "2025-09-17T01:35:46.891Z",
+		"tasksAnalyzed": 10,
+		"totalTasks": 10,
+		"analysisCount": 10,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "Supabase 프로젝트 설정 및 인증 구성",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Supabase 프로젝트 초기 설정을 환경 구성, 프로젝트 생성, 클라이언트 설정, 인증 활성화 단계로 세분화하여 체계적으로 구현",
+			"reasoning": "비교적 표준적인 설정 작업이지만 여러 구성 요소가 포함되어 있어 중간 복잡도. 각 설정 단계를 분리하면 오류 추적이 용이함"
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "데이터베이스 스키마 생성 및 테이블 구축",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "복잡한 데이터베이스 스키마를 ENUM 타입 정의, 핵심 테이블 생성, 관계 테이블 생성, 제출물 테이블, 이미지 테이블, 제약조건 설정으로 단계별 구축",
+			"reasoning": "8개의 서로 다른 테이블 그룹과 복잡한 관계 설정이 필요한 고복잡도 작업. 의존성이 많아 단계적 접근이 필수적임"
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Supabase Storage 버킷 설정 및 파일 업로드 구성",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "파일 저장소 구성을 버킷 생성, 업로드 정책 설정, 파일 경로 구조 정의, 다중 업로드 기능 구현으로 체계화",
+			"reasoning": "3개의 서로 다른 버킷과 복잡한 정책 설정이 필요한 중상급 복잡도. 파일 처리 로직과 보안 정책이 핵심"
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Row Level Security (RLS) 정책 구현",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "역할 기반 보안 정책을 사용자 프로필 정책, 과제 관련 정책, 문제집 접근 정책, 반 멤버십 정책, 검증 함수 작성으로 구현",
+			"reasoning": "보안이 핵심인 고복잡도 작업. 여러 역할과 테이블에 걸친 복잡한 접근 권한 로직이 필요하며 실수 시 보안 취약점 발생 가능"
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Next.js 프로젝트 설정 및 기본 인증 시스템 구현",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "프론트엔드 기반 구축을 프로젝트 초기화, UI 프레임워크 설정, 인증 컨텍스트 구현, 로그인/회원가입 페이지, 라우팅 가드 구현으로 구성",
+			"reasoning": "여러 기술 스택 통합과 인증 플로우 구현이 필요한 중상급 복잡도. TypeScript, Tailwind, Supabase 통합이 핵심"
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "문제집 생성 및 관리 기능 구현",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "복합적인 문제집 관리 시스템을 목록/검색 UI, 생성 폼 구현, 5가지 유형별 로직, 이미지 업로드 기능, 편집/삭제 기능으로 모듈화",
+			"reasoning": "5가지 서로 다른 문제집 유형과 복잡한 UI 상호작용이 필요한 고복잡도. 각 유형별 특수 로직과 파일 처리가 핵심"
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "과제 출제 시스템 구현",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "과제 출제 워크플로우를 출제 인터페이스 구현, 대상 선택 시스템, 문제집 필터링, 자동 과제 생성 로직으로 구조화",
+			"reasoning": "복잡한 사용자 선택 로직과 자동 데이터 생성이 필요한 중상급 복잡도. 반/개인 선택과 대량 데이터 생성이 핵심"
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "학생 과제 수행 시스템 구현",
+			"complexityScore": 8,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "다양한 과제 유형별 수행 시스템을 과제 목록 UI, SRS 알고리즘 구현, PDF 제출 기능, 서술형 제출, 특수 유형 제출, 완료 처리 로직으로 세분화",
+			"reasoning": "5가지 서로 다른 과제 유형과 복잡한 SRS 알고리즘이 필요한 고복잡도. 각 유형별 고유한 로직과 상태 관리가 핵심"
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "교사 과제 현황 관리 시스템 구현",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "포괄적인 과제 관리 대시보드를 개별 현황 페이지, 반별 현황 페이지, 완료율 계산 시스템, 평가 시스템, 인쇄 요청 기능으로 모듈화",
+			"reasoning": "복잡한 데이터 집계와 다양한 뷰가 필요한 고복잡도. 실시간 통계 계산과 평가 워크플로우가 핵심"
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "어드민 관리 시스템 및 인쇄 큐 구현",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "관리자 전용 시스템을 사용자 권한 관리, 반 관리 시스템, 인쇄 큐 관리, 시스템 모니터링으로 구성하여 구현",
+			"reasoning": "관리자 기능의 다양성과 시스템 전반의 제어가 필요한 중상급 복잡도. 권한 관리와 큐 시스템 처리가 핵심"
+		}
+	]
+}

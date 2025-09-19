@@ -1,0 +1,665 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Supabase 프로젝트 설정 및 인증 구성",
+        "description": "Supabase 프로젝트를 생성하고 이메일/비밀번호 인증을 활성화하며 기본 설정을 구성합니다.",
+        "details": "1. Supabase 프로젝트 생성\n2. Authentication 설정에서 Email/Password 활성화\n3. 환경변수 설정 (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)\n4. @supabase/supabase-js 클라이언트 설치 및 설정\n5. Supabase 클라이언트 초기화 파일 생성\n6. 기본 RLS 활성화",
+        "testStrategy": "Supabase 대시보드에서 프로젝트 생성 확인, 클라이언트 연결 테스트, 환경변수 로드 확인",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Supabase 계정 생성 및 프로젝트 초기화",
+            "description": "Supabase 웹사이트에서 계정을 생성하고 새 프로젝트를 설정합니다.",
+            "dependencies": [],
+            "details": "1. Supabase 웹사이트 접속 및 계정 생성\n2. 새 프로젝트 생성 (조직 선택, 프로젝트명 설정)\n3. 데이터베이스 비밀번호 설정\n4. 지역 선택 (Asia Pacific - Seoul 권장)\n5. 프로젝트 생성 완료 및 대시보드 접근 확인",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "이메일/비밀번호 인증 활성화 및 설정",
+            "description": "Supabase Authentication 설정에서 이메일/비밀번호 인증을 활성화하고 관련 설정을 구성합니다.",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "1. Authentication 탭 접속\n2. Providers 섹션에서 Email 활성화\n3. Email 확인 필수 설정 구성\n4. 비밀번호 정책 설정 (최소 길이, 복잡도)\n5. 리다이렉트 URL 설정 (localhost:3000 추가)\n6. 인증 설정 저장 및 확인",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Next.js 프로젝트에 Supabase 클라이언트 설치 및 설정",
+            "description": "프로젝트에 Supabase JavaScript 클라이언트를 설치하고 초기화 파일을 생성합니다.",
+            "dependencies": [
+              "1.1"
+            ],
+            "details": "1. @supabase/supabase-js 패키지 설치\n2. Supabase 프로젝트 API 키 및 URL 확인\n3. .env.local 파일 생성 및 환경변수 설정\n4. lib/supabase.ts 파일 생성 및 클라이언트 초기화\n5. 클라이언트 연결 테스트 코드 작성\n6. TypeScript 타입 정의 추가",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "Row Level Security(RLS) 활성화 및 기본 정책 설정",
+            "description": "데이터베이스 보안을 위해 RLS를 활성화하고 기본 보안 정책을 설정합니다.",
+            "dependencies": [
+              "1.2",
+              "1.3"
+            ],
+            "details": "1. SQL Editor에서 RLS 활성화 명령 실행\n2. public 스키마의 기본 테이블에 RLS 적용\n3. 인증된 사용자만 접근 가능한 기본 정책 생성\n4. 정책 테스트를 위한 임시 테이블 생성\n5. 인증/비인증 사용자 접근 권한 확인\n6. RLS 정책 적용 상태 검증",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "데이터베이스 스키마 생성 및 테이블 구축",
+        "description": "PRD에 명시된 모든 테이블과 ENUM 타입을 생성하고 관계를 설정합니다.",
+        "details": "1. ENUM 타입 생성 (subject, workbook_type, role, task_status, print_status, color_opt)\n2. profiles 테이블 생성 및 auth.users 연결\n3. classes, class_members 테이블 생성\n4. workbooks, workbook_items 테이블 생성\n5. assignments, student_tasks 테이블 생성\n6. 제출물 관련 테이블 생성 (answers, srs_state, essay_reviews, viewing_notes, lecture_summaries, pdf_uploads, print_requests)\n7. 이미지 관련 테이블 생성 (workbook_item_images, task_images)\n8. 외래키 제약조건 및 인덱스 설정",
+        "testStrategy": "Supabase 테이블 에디터에서 모든 테이블 생성 확인, 관계 설정 검증, 제약조건 테스트",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "ENUM 타입 정의 및 생성",
+            "description": "데이터베이스에서 사용할 모든 ENUM 타입을 정의하고 생성합니다.",
+            "dependencies": [],
+            "details": "subject, workbook_type, role, task_status, print_status, color_opt 등 6개의 ENUM 타입을 SQL로 정의하고 Supabase에서 생성합니다. 각 ENUM의 허용값을 PRD 명세에 따라 정확히 설정합니다.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "사용자 프로필 및 인증 테이블 생성",
+            "description": "사용자 프로필 테이블을 생성하고 Supabase auth.users와 연결합니다.",
+            "dependencies": [
+              "2.1"
+            ],
+            "details": "profiles 테이블을 생성하고 auth.users와 1:1 관계를 설정합니다. 사용자 역할, 이름, 학번 등의 필드를 포함하며 RLS 정책을 설정합니다.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "반 관리 테이블 생성",
+            "description": "반과 반원 관리를 위한 테이블들을 생성합니다.",
+            "dependencies": [
+              "2.2"
+            ],
+            "details": "classes 테이블과 class_members 테이블을 생성합니다. 반 정보, 담당 교사, 반원 정보를 관리하며 적절한 외래키 관계를 설정합니다.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "교재 및 문제 테이블 생성",
+            "description": "교재와 교재 아이템을 관리하는 테이블들을 생성합니다.",
+            "dependencies": [
+              "2.3"
+            ],
+            "details": "workbooks 테이블과 workbook_items 테이블을 생성합니다. 교재 정보, 문제 정보, 유형별 분류를 관리하며 계층 구조를 지원하는 관계를 설정합니다.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "과제 및 학습 진행 테이블 생성",
+            "description": "과제 배정과 학생 과제 수행 상태를 관리하는 테이블들을 생성합니다.",
+            "dependencies": [
+              "2.4"
+            ],
+            "details": "assignments, student_tasks 테이블과 제출물 관련 테이블들(answers, srs_state, essay_reviews, viewing_notes, lecture_summaries, pdf_uploads, print_requests)을 생성합니다. 과제 유형별 제출 데이터를 관리합니다.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "이미지 테이블 및 제약조건 설정",
+            "description": "이미지 관련 테이블을 생성하고 모든 외래키 제약조건 및 인덱스를 설정합니다.",
+            "dependencies": [
+              "2.5"
+            ],
+            "details": "workbook_item_images, task_images 테이블을 생성하고 모든 테이블의 외래키 제약조건을 설정합니다. 성능 최적화를 위한 인덱스를 생성하고 데이터 무결성을 보장하는 제약조건을 추가합니다.",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Supabase Storage 버킷 설정 및 파일 업로드 구성",
+        "description": "PDF, 이미지 파일 업로드를 위한 Storage 버킷을 생성하고 정책을 설정합니다.",
+        "details": "1. Storage 버킷 생성 (pdf-submissions, item-images, task-images)\n2. 버킷별 업로드 정책 설정\n3. 파일 경로 구조 정의 (student_task_id/filename.pdf, workbook_item_id/uuid.jpg, student_task_id/uuid.jpg)\n4. 파일 크기 및 타입 제한 설정\n5. 다중 이미지 업로드 지원 구현\n6. 파일 삭제 정책 설정",
+        "testStrategy": "각 버킷에 테스트 파일 업로드/다운로드 확인, 정책 적용 테스트, 다중 파일 업로드 테스트",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Storage 버킷 생성 및 기본 설정",
+            "description": "PDF 제출물과 이미지 파일 저장을 위한 3개의 Storage 버킷을 생성하고 기본 설정을 구성합니다.",
+            "dependencies": [],
+            "details": "1. pdf-submissions 버킷 생성 (PDF 제출물 저장용)\n2. item-images 버킷 생성 (문제집 아이템 이미지 저장용)\n3. task-images 버킷 생성 (학생 과제 이미지 저장용)\n4. 각 버킷별 공개/비공개 설정\n5. 버킷 생성 확인 및 기본 접근 테스트",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "버킷별 RLS 정책 설정",
+            "description": "각 버킷에 대한 Row Level Security 정책을 설정하여 적절한 접근 권한을 구성합니다.",
+            "dependencies": [
+              "3.1"
+            ],
+            "details": "1. pdf-submissions 버킷: 학생은 본인 과제만 업로드/조회, 교사는 전체 조회 가능\n2. item-images 버킷: 교사만 업로드 가능, 모든 사용자 조회 가능\n3. task-images 버킷: 학생은 본인 과제 이미지만 업로드/조회\n4. 정책별 SQL 작성 및 적용\n5. 정책 동작 테스트 및 검증",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "파일 경로 구조 및 제약조건 설정",
+            "description": "각 버킷의 파일 저장 경로 구조를 정의하고 파일 크기, 타입 제한을 설정합니다.",
+            "dependencies": [
+              "3.2"
+            ],
+            "details": "1. PDF 파일 경로: student_task_id/filename.pdf 구조 정의\n2. 문제집 이미지: workbook_item_id/uuid.jpg 구조 정의\n3. 과제 이미지: student_task_id/uuid.jpg 구조 정의\n4. 파일 크기 제한 설정 (PDF: 10MB, 이미지: 5MB)\n5. 허용 파일 타입 제한 (PDF: .pdf, 이미지: .jpg, .jpeg, .png)\n6. 파일명 유효성 검사 규칙 적용",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "다중 파일 업로드 및 삭제 정책 구현",
+            "description": "다중 이미지 업로드 기능을 구현하고 파일 삭제 정책을 설정합니다.",
+            "dependencies": [
+              "3.3"
+            ],
+            "details": "1. 다중 이미지 동시 업로드 기능 구현\n2. 업로드 진행률 표시 및 에러 처리\n3. 파일 삭제 정책 설정 (본인 파일만 삭제 가능)\n4. 과제 완료 시 자동 파일 정리 로직\n5. 파일 업로드/삭제 로깅 시스템\n6. 전체 파일 처리 기능 통합 테스트",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Row Level Security (RLS) 정책 구현",
+        "description": "사용자 역할별 데이터 접근 권한을 제어하는 RLS 정책을 구현합니다.",
+        "details": "1. profiles 테이블 RLS 정책 (본인 정보만 조회/수정)\n2. student_tasks RLS 정책 (학생은 본인 과제만, 교사는 본인이 출제한 과제만)\n3. workbooks RLS 정책 (교사/어드민만 생성/수정)\n4. 제출물 관련 테이블 RLS 정책\n5. class_members 정책 (본인이 속한 반만 조회)\n6. 역할별 접근 권한 검증 함수 작성",
+        "testStrategy": "각 역할별로 데이터 접근 테스트, 권한 없는 데이터 접근 차단 확인, 정책 우회 시도 테스트",
+        "priority": "high",
+        "dependencies": [
+          2
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "profiles 테이블 RLS 정책 구현",
+            "description": "사용자가 본인의 프로필 정보만 조회/수정할 수 있도록 하는 RLS 정책을 구현합니다.",
+            "dependencies": [],
+            "details": "auth.uid()를 사용하여 profiles 테이블에 SELECT, UPDATE 정책 생성. 본인 데이터만 접근 가능하도록 WHERE user_id = auth.uid() 조건 설정. INSERT는 새 사용자 가입 시에만 허용되도록 정책 구성.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "student_tasks 및 assignments RLS 정책 구현",
+            "description": "학생은 본인 과제만, 교사는 본인이 출제한 과제만 조회할 수 있는 RLS 정책을 구현합니다.",
+            "dependencies": [
+              "4.1"
+            ],
+            "details": "student_tasks 테이블: 학생은 student_id = auth.uid() 조건으로 본인 과제만 조회. assignments 테이블: 교사는 teacher_id = auth.uid() 조건으로 본인이 출제한 과제만 관리. 역할별 권한 체크 함수 활용.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "workbooks 및 workbook_items RLS 정책 구현",
+            "description": "교사와 어드민만 문제집을 생성/수정할 수 있고, 학생은 조회만 가능한 RLS 정책을 구현합니다.",
+            "dependencies": [
+              "4.2"
+            ],
+            "details": "workbooks 테이블: INSERT/UPDATE/DELETE는 teacher/admin 역할만 허용. SELECT는 모든 사용자 허용. workbook_items도 동일한 정책 적용. 역할 확인을 위한 profiles.role 조인 활용.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "class_members 및 제출물 관련 테이블 RLS 정책 구현",
+            "description": "반 멤버십과 제출물 관련 테이블들에 대한 접근 권한을 제어하는 RLS 정책을 구현합니다.",
+            "dependencies": [
+              "4.3"
+            ],
+            "details": "class_members: 본인이 속한 반만 조회 가능. answers, essay_reviews, viewing_notes 등 제출물 테이블: 학생은 본인 제출물만, 교사는 본인 반 학생들 제출물만 접근. pdf_uploads, print_requests도 동일한 원칙 적용.",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "역할별 접근 권한 검증 함수 작성 및 정책 통합 테스트",
+            "description": "역할 기반 권한 체크를 위한 PL/pgSQL 함수를 작성하고 모든 RLS 정책의 통합 테스트를 수행합니다.",
+            "dependencies": [
+              "4.4"
+            ],
+            "details": "get_user_role(), is_teacher(), is_admin(), is_class_member() 등 권한 검증 함수 작성. 모든 테이블의 RLS 정책 활성화 확인. 각 역할별로 데이터 접근 테스트 수행하여 정책 동작 검증. 권한 없는 접근 차단 확인.",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Next.js 프로젝트 설정 및 기본 인증 시스템 구현",
+        "description": "Next.js 프로젝트를 설정하고 Supabase 인증과 연동하여 로그인/회원가입 기능을 구현합니다.",
+        "details": "1. Next.js 프로젝트 생성 및 TypeScript 설정\n2. Tailwind CSS 설정\n3. Supabase 클라이언트 설정 및 인증 컨텍스트 생성\n4. 로그인/회원가입 페이지 구현\n5. 프로필 자동 생성 트리거 함수 작성 (auth.users → profiles)\n6. 역할별 라우팅 가드 구현\n7. 레이아웃 컴포넌트 및 네비게이션 구현",
+        "testStrategy": "회원가입/로그인 플로우 테스트, 프로필 자동 생성 확인, 역할별 페이지 접근 권한 테스트",
+        "priority": "high",
+        "dependencies": [
+          1,
+          4
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Next.js 프로젝트 초기화 및 TypeScript 설정",
+            "description": "Next.js 프로젝트를 생성하고 TypeScript, ESLint, Prettier 등 개발 환경을 구성합니다.",
+            "dependencies": [],
+            "details": "create-next-app을 사용하여 TypeScript 템플릿으로 프로젝트 생성, tsconfig.json 설정, package.json 의존성 확인, 개발 서버 실행 테스트",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "Tailwind CSS 및 UI 프레임워크 설정",
+            "description": "Tailwind CSS를 설치하고 설정하여 스타일링 시스템을 구축합니다.",
+            "dependencies": [
+              "5.1"
+            ],
+            "details": "Tailwind CSS 설치 및 설정, tailwind.config.js 구성, globals.css 설정, 기본 컴포넌트 스타일 확인",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "Supabase 클라이언트 설정 및 인증 컨텍스트 구현",
+            "description": "Supabase 클라이언트를 설정하고 React Context를 사용한 인증 시스템을 구현합니다.",
+            "dependencies": [
+              "5.2"
+            ],
+            "details": "Supabase 클라이언트 초기화, AuthContext 생성, useAuth 훅 구현, 인증 상태 관리, 세션 지속성 처리",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "로그인/회원가입 페이지 및 폼 컴포넌트 구현",
+            "description": "사용자 인증을 위한 로그인 및 회원가입 페이지를 구현합니다.",
+            "dependencies": [
+              "5.3"
+            ],
+            "details": "로그인 페이지 컴포넌트, 회원가입 페이지 컴포넌트, 폼 유효성 검사, 오류 처리, 역할 선택 기능, 리다이렉트 로직 구현",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "라우팅 가드 및 레이아웃 시스템 구현",
+            "description": "역할별 페이지 접근 제어와 공통 레이아웃 컴포넌트를 구현합니다.",
+            "dependencies": [
+              "5.4"
+            ],
+            "details": "ProtectedRoute 컴포넌트, 역할별 라우팅 가드, 공통 레이아웃 컴포넌트, 네비게이션 바, 사이드바, 프로필 드롭다운 메뉴 구현",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "문제집 생성 및 관리 기능 구현",
+        "description": "교사가 5가지 유형의 문제집을 생성하고 관리할 수 있는 기능을 구현합니다.",
+        "details": "1. 문제집 목록 페이지 구현 (/teacher/workbooks)\n2. 문제집 생성 폼 구현 (/teacher/workbook/new)\n3. 5가지 유형별 문제집 생성 로직 (SRS, PDF, 서술형, 영화감상형, 인터넷강의시청형)\n4. 문항 이미지 다중 업로드 기능 구현\n5. 태그, 과목, 주차 설정 기능\n6. 문제집 수정/삭제 기능\n7. 문제집 검색 및 필터링 기능",
+        "testStrategy": "각 유형별 문제집 생성 테스트, 이미지 업로드 기능 테스트, 검색/필터링 동작 확인",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          5
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "문제집 목록 및 검색 인터페이스 구현",
+            "description": "교사용 문제집 목록 페이지와 검색/필터링 기능을 구현합니다.",
+            "dependencies": [],
+            "details": "1. /teacher/workbooks 페이지 라우팅 설정\n2. 문제집 목록 표시 컴포넌트 구현\n3. 과목별, 주차별, 유형별 필터링 기능\n4. 제목 기반 검색 기능\n5. 문제집 정렬 옵션 (생성일, 제목순)\n6. 페이지네이션 구현\n7. 문제집 카드 UI 컴포넌트 작성",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "문제집 생성 폼 인터페이스 구현",
+            "description": "새 문제집을 생성하기 위한 폼 페이지와 기본 설정 UI를 구현합니다.",
+            "dependencies": [
+              "6.1"
+            ],
+            "details": "1. /teacher/workbook/new 페이지 라우팅 설정\n2. 문제집 기본 정보 입력 폼 (제목, 설명)\n3. 문제집 유형 선택 라디오 버튼 그룹\n4. 과목 선택 드롭다운\n5. 주차 설정 입력 필드\n6. 태그 입력 및 관리 기능\n7. 폼 유효성 검증 로직\n8. 취소/저장 버튼 액션 처리",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "5가지 유형별 문제집 생성 로직 구현",
+            "description": "SRS, PDF, 서술형, 영화감상형, 인터넷강의시청형 각각의 특수 생성 로직을 구현합니다.",
+            "dependencies": [
+              "6.2"
+            ],
+            "details": "1. SRS형 문제집 생성 로직 (간격반복 설정)\n2. PDF형 문제집 생성 로직 (파일 업로드 요구사항)\n3. 서술형 문제집 생성 로직 (채점 기준 설정)\n4. 영화감상형 문제집 생성 로직 (영상 링크 설정)\n5. 인터넷강의시청형 문제집 생성 로직 (강의 URL 설정)\n6. 유형별 데이터 검증 함수\n7. workbooks 테이블 INSERT 로직\n8. 생성 완료 후 리다이렉트 처리",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "문항 이미지 다중 업로드 시스템 구현",
+            "description": "문제집 문항에 첨부할 이미지를 여러 개 업로드하고 관리하는 기능을 구현합니다.",
+            "dependencies": [
+              "6.3"
+            ],
+            "details": "1. 파일 드래그앤드롭 업로드 컴포넌트\n2. 이미지 미리보기 기능\n3. Supabase Storage 이미지 업로드 API\n4. workbook_item_images 테이블 연동\n5. 이미지 순서 변경 기능\n6. 이미지 삭제 기능\n7. 파일 크기 및 형식 검증\n8. 업로드 진행률 표시",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "문제집 편집 및 삭제 기능 구현",
+            "description": "기존 문제집을 수정하고 삭제할 수 있는 관리 기능을 구현합니다.",
+            "dependencies": [
+              "6.1",
+              "6.2",
+              "6.3",
+              "6.4"
+            ],
+            "details": "1. /teacher/workbook/edit/:id 페이지 구현\n2. 기존 문제집 데이터 로드 및 폼 초기화\n3. 문제집 정보 수정 로직\n4. 기존 이미지 관리 (추가/삭제/순서변경)\n5. 문제집 삭제 확인 모달\n6. 연관된 과제 존재 시 삭제 제한 로직\n7. workbook_items와 이미지 CASCADE 삭제\n8. 수정/삭제 권한 검증 (작성자 확인)",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "과제 출제 시스템 구현",
+        "description": "교사가 반 또는 개별 학생에게 문제집을 과제로 출제할 수 있는 시스템을 구현합니다.",
+        "details": "1. 과제 출제 페이지 구현 (/teacher/assign)\n2. 반 목록 조회 및 학생 선택 기능\n3. 문제집 선택 및 필터링 (과목/차시/제목)\n4. 마감일 설정 기능\n5. 대상 선택 (반/개인) 기능\n6. 과제 출제 시 student_tasks 자동 생성 로직\n7. 출제 완료 확인 및 알림",
+        "testStrategy": "반별/개별 과제 출제 테스트, student_tasks 자동 생성 확인, 마감일 설정 검증",
+        "priority": "medium",
+        "dependencies": [
+          6
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "과제 출제 기본 인터페이스 구현",
+            "description": "교사가 과제를 출제할 수 있는 기본 페이지와 폼 구조를 구현합니다.",
+            "dependencies": [],
+            "details": "1. /teacher/assign 페이지 라우팅 및 기본 레이아웃 구성\n2. 과제 출제 폼 UI 컴포넌트 구현\n3. 마감일 선택 달력 컴포넌트 구현\n4. 출제 완료 확인 모달 및 알림 시스템\n5. 기본 폼 검증 로직 구현",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "대상 선택 시스템 구현",
+            "description": "반 또는 개별 학생을 선택할 수 있는 대상 선택 기능을 구현합니다.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "1. 반 목록 조회 API 연동\n2. 반별 학생 목록 조회 기능\n3. 반/개인 선택 토글 UI 구현\n4. 개별 학생 다중 선택 체크박스 구현\n5. 선택된 대상 미리보기 컴포넌트",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "문제집 선택 및 필터링 시스템 구현",
+            "description": "과목, 차시, 제목으로 문제집을 필터링하고 선택할 수 있는 기능을 구현합니다.",
+            "dependencies": [
+              "7.1"
+            ],
+            "details": "1. 문제집 목록 조회 API 연동\n2. 과목별 필터링 드롭다운 구현\n3. 차시별 필터링 옵션 구현\n4. 제목 검색 기능 구현\n5. 문제집 선택 카드 UI 및 선택 상태 관리",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "과제 자동 생성 로직 구현",
+            "description": "선택된 대상과 문제집을 기반으로 student_tasks를 자동 생성하는 로직을 구현합니다.",
+            "dependencies": [
+              "7.2",
+              "7.3"
+            ],
+            "details": "1. 과제 출제 API 엔드포인트 구현\n2. 반별/개별 대상에 따른 student_tasks 생성 로직\n3. assignments 테이블 데이터 삽입 로직\n4. 대량 데이터 생성 시 트랜잭션 처리\n5. 출제 완료 후 리다이렉트 및 성공 메시지 처리",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "학생 과제 수행 시스템 구현",
+        "description": "학생이 배정된 과제를 확인하고 유형별로 수행할 수 있는 시스템을 구현합니다.",
+        "details": "1. 학생 과제 목록 페이지 구현 (/student/tasks)\n2. 과제 상세 수행 페이지 구현 (/student/task/:taskId)\n3. SRS형 과제 수행 로직 (간격반복 알고리즘 포함)\n4. PDF 제출형 과제 업로드 기능\n5. 서술형 과제 텍스트 제출 기능\n6. 영화감상형 감상노트 작성 기능\n7. 인터넷강의시청형 요약 제출 기능\n8. 과제별 이미지 첨부 기능\n9. 과제 완료 처리 로직",
+        "testStrategy": "각 유형별 과제 수행 테스트, SRS 알고리즘 동작 확인, 파일 업로드 테스트, 완료 처리 검증",
+        "priority": "medium",
+        "dependencies": [
+          7
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "학생 과제 목록 페이지 UI 구현",
+            "description": "학생이 배정받은 과제들을 확인할 수 있는 목록 페이지를 구현합니다. 과제 유형별 필터링과 진행 상태 표시를 포함합니다.",
+            "dependencies": [],
+            "details": "1. /student/tasks 라우트 생성\n2. 과제 목록 컴포넌트 구현\n3. 과제 유형별 아이콘 및 상태 표시\n4. 진행률 시각화 (완료/미완료)\n5. 과제 유형별 필터링 기능\n6. 반응형 디자인 적용",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "SRS형 과제 수행 시스템 및 간격반복 알고리즘 구현",
+            "description": "간격반복학습(SRS) 알고리즘을 적용한 과제 수행 시스템을 구현합니다. 학습자의 정답률에 따른 복습 간격 조정 로직을 포함합니다.",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "1. SRS 알고리즘 로직 구현 (SM-2 기반)\n2. 문항별 복습 간격 계산\n3. 정답률에 따른 난이도 조정\n4. srs_state 테이블 상태 관리\n5. 복습 스케줄링 시스템\n6. 진행 상황 추적 및 저장",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "PDF 제출형 과제 업로드 기능 구현",
+            "description": "학생이 PDF 파일을 업로드하여 과제를 제출할 수 있는 시스템을 구현합니다. 파일 검증과 저장 처리를 포함합니다.",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "1. 파일 업로드 컴포넌트 구현\n2. PDF 파일 형식 검증\n3. 파일 크기 제한 설정\n4. Supabase Storage 연동\n5. pdf_uploads 테이블 데이터 저장\n6. 업로드 진행률 표시",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "서술형 과제 텍스트 제출 기능 구현",
+            "description": "학생이 텍스트로 답안을 작성하여 서술형 과제를 제출할 수 있는 시스템을 구현합니다. 자동 저장과 글자 수 제한을 포함합니다.",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "1. 텍스트 에디터 컴포넌트 구현\n2. 자동 저장 기능 (debounce 적용)\n3. 글자 수 제한 및 카운터 표시\n4. answers 테이블 데이터 저장\n5. 임시 저장 및 최종 제출 상태 관리\n6. 제출 확인 모달",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "특수 유형 과제 수행 기능 구현 (영화감상, 인터넷강의)",
+            "description": "영화감상형 감상노트와 인터넷강의시청형 요약 제출 기능을 구현합니다. 각 유형별 특화된 입력 폼을 제공합니다.",
+            "dependencies": [
+              "8.1"
+            ],
+            "details": "1. 영화감상 노트 작성 폼 구현\n2. viewing_notes 테이블 연동\n3. 인터넷강의 요약 작성 폼 구현\n4. lecture_summaries 테이블 연동\n5. 유형별 템플릿 제공\n6. 이미지 첨부 기능 연동",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 6,
+            "title": "과제 완료 처리 및 이미지 첨부 시스템 구현",
+            "description": "과제별 이미지 첨부 기능과 과제 완료 상태 처리 로직을 구현합니다. 최종 제출 처리와 상태 업데이트를 포함합니다.",
+            "dependencies": [
+              "8.2",
+              "8.3",
+              "8.4",
+              "8.5"
+            ],
+            "details": "1. 이미지 업로드 컴포넌트 구현\n2. task_images 테이블 연동\n3. 과제 완료 상태 변경 로직\n4. student_tasks 테이블 상태 업데이트\n5. 제출 완료 알림 기능\n6. 완료된 과제 수정 제한 처리",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "교사 과제 현황 관리 시스템 구현",
+        "description": "교사가 출제한 과제의 진행 상황을 확인하고 관리할 수 있는 시스템을 구현합니다.",
+        "details": "1. 개별 과제 현황 페이지 구현 (My Assignments)\n2. 반별 과제 현황 페이지 구현 (All Classes)\n3. 학생별 완료율 계산 로직 구현\n4. 서술형 과제 평가 시스템 (/teacher/reviews)\n5. PDF 인쇄 요청 생성 기능\n6. 유형별 점검 UI 구현\n7. 과제 현황 필터링 및 정렬 기능\n8. 미완료 학생 드릴다운 기능",
+        "testStrategy": "완료율 계산 정확성 테스트, 서술형 평가 기능 테스트, 인쇄 요청 생성 확인, 필터링 동작 검증",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "개별 과제 현황 페이지 구현 (My Assignments)",
+            "description": "교사가 본인이 출제한 과제들의 개별 현황을 확인할 수 있는 페이지를 구현합니다.",
+            "dependencies": [],
+            "details": "- /teacher/assignments 라우트 구현\n- 교사별 과제 목록 조회 API 연동\n- 과제별 완료율, 진행 상황 표시\n- 과제 유형별 아이콘 및 상태 표시\n- 과제 클릭 시 상세 현황으로 이동하는 네비게이션",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "반별 과제 현황 페이지 구현 (All Classes)",
+            "description": "모든 반의 과제 현황을 통합적으로 확인할 수 있는 페이지를 구현합니다.",
+            "dependencies": [],
+            "details": "- /teacher/classes 라우트 구현\n- 반별 과제 현황 집계 데이터 조회\n- 반별 완료율 및 진행 상황 시각화\n- 반 선택 시 해당 반의 상세 현황 표시\n- 드릴다운 기능으로 개별 학생 현황 확인",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "완료율 계산 및 통계 시스템 구현",
+            "description": "학생별, 반별, 과제별 완료율을 실시간으로 계산하는 시스템을 구현합니다.",
+            "dependencies": [
+              "9.1",
+              "9.2"
+            ],
+            "details": "- 완료율 계산 로직 구현 (완료/전체 과제 비율)\n- 실시간 통계 업데이트 기능\n- 학생별 개별 완료율 계산\n- 반별 평균 완료율 계산\n- 과제 유형별 완료율 분석\n- 캐싱을 통한 성능 최적화",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "서술형 과제 평가 시스템 구현 (/teacher/reviews)",
+            "description": "교사가 학생들의 서술형 과제를 평가하고 피드백을 제공할 수 있는 시스템을 구현합니다.",
+            "dependencies": [],
+            "details": "- /teacher/reviews 라우트 구현\n- 미평가 서술형 과제 목록 표시\n- 과제별 학생 답안 조회 및 평가 인터페이스\n- 점수 입력 및 텍스트 피드백 기능\n- 평가 완료/미완료 상태 관리\n- 평가 히스토리 및 통계 제공",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 5,
+            "title": "PDF 인쇄 요청 및 필터링 기능 구현",
+            "description": "PDF 인쇄 요청 생성 기능과 과제 현황 필터링/정렬 기능을 구현합니다.",
+            "dependencies": [
+              "9.1",
+              "9.2"
+            ],
+            "details": "- PDF 인쇄 요청 생성 UI 및 로직 구현\n- 인쇄 요청 상태 관리 (requested/processing/done)\n- 과제 현황 필터링 (유형별, 상태별, 기간별)\n- 정렬 기능 (완료율, 생성일, 마감일)\n- 미완료 학생 드릴다운 기능\n- 검색 기능 및 페이지네이션",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "어드민 관리 시스템 및 인쇄 큐 구현",
+        "description": "어드민이 사용자 권한과 반을 관리하고 인쇄 큐를 처리할 수 있는 시스템을 구현합니다.",
+        "details": "1. 어드민 반 관리 페이지 구현 (/admin/classes)\n2. 사용자 권한 관리 기능 (역할 부여/해제)\n3. 반 생성/삭제/학생 배정 기능\n4. 인쇄 큐 관리 페이지 구현 (/admin/print-queue)\n5. 인쇄 요청 상태 관리 (requested/done/canceled)\n6. 반별/교시별 인쇄 요청 필터링\n7. 일괄 인쇄 처리 기능\n8. 시스템 관리 기능 및 기본 로깅",
+        "testStrategy": "권한 변경 반영 테스트, 반 관리 기능 테스트, 인쇄 큐 처리 확인, 필터링 및 일괄 처리 검증",
+        "priority": "medium",
+        "dependencies": [
+          9
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "어드민 권한 관리 시스템 구현",
+            "description": "사용자 권한을 관리하고 역할을 부여/해제할 수 있는 시스템을 구현합니다.",
+            "dependencies": [],
+            "details": "사용자 권한 관리 페이지(/admin/users) 구현, 역할 부여/해제 API 및 UI 개발, 권한 변경 시 실시간 반영 로직 구현, 권한별 접근 제어 검증 시스템 구축",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 2,
+            "title": "어드민 반 관리 시스템 구현",
+            "description": "반 생성/삭제 및 학생 배정을 관리할 수 있는 시스템을 구현합니다.",
+            "dependencies": [
+              "10.1"
+            ],
+            "details": "반 관리 페이지(/admin/classes) 구현, 반 생성/삭제 API 및 UI 개발, 학생 배정/해제 기능 구현, 반별 학생 목록 조회 및 관리 기능 구축",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 3,
+            "title": "인쇄 큐 관리 시스템 구현",
+            "description": "인쇄 요청을 관리하고 처리할 수 있는 큐 시스템을 구현합니다.",
+            "dependencies": [
+              "10.2"
+            ],
+            "details": "인쇄 큐 관리 페이지(/admin/print-queue) 구현, 인쇄 요청 상태 관리(requested/done/canceled) 시스템 구축, 반별/교시별 필터링 기능 개발, 일괄 인쇄 처리 기능 구현",
+            "status": "done",
+            "testStrategy": ""
+          },
+          {
+            "id": 4,
+            "title": "시스템 모니터링 및 로깅 구현",
+            "description": "시스템 전반의 활동을 모니터링하고 로깅할 수 있는 시스템을 구현합니다.",
+            "dependencies": [
+              "10.3"
+            ],
+            "details": "시스템 관리 대시보드 구현, 사용자 활동 로깅 시스템 구축, 시스템 상태 모니터링 기능 개발, 오류 추적 및 알림 시스템 구현",
+            "status": "done",
+            "testStrategy": ""
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-09-17T01:32:44.349Z",
+      "updated": "2025-09-17T05:17:35.158Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
